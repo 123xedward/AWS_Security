@@ -1,0 +1,18 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "config:GetComplianceDetailsByConfigRule",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:DescribeSecurityGroups",
+                "ec2:RevokeSecurityGroupIngress",
+                "s3:GetBucketAcl",
+                "s3:PutBucketAcl",
+                "sns:Publish"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}

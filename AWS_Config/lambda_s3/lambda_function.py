@@ -61,7 +61,8 @@ def lambda_handler(event, context):
 
 def get_sec_group(sg_id):
     """Return the Security Group given a Security Group ID"""
-    sec_group = EC2_CLIENT.describe_security_groups(Filters=[{'Name': 'group-id', 'Values': [sg_id]}])
+    sec_group = EC2_CLIENT.describe_security_groups(
+        Filters=[{'Name': 'group-id', 'Values': [sg_id]}])
     return sec_group
 
 
@@ -95,7 +96,8 @@ def remove_old_rule(r, sg, ip):
             print('Public IP already exists')
             return False
         else:
-            EC2_CLIENT.revoke_security_group_ingress(GroupId=sg, IpPermissions=rules['IpPermissions'])
+            EC2_CLIENT.revoke_security_group_ingress(
+                GroupId=sg, IpPermissions=rules['IpPermissions'])
             return True
 
     else:
