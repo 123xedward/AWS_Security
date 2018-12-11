@@ -1,0 +1,1 @@
+Cloudformation Stack which install and enable Session Manager.
