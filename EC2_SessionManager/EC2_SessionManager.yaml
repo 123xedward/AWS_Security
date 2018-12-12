@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Simple EC2 instance
+Description: Simple EC2 instance which install SSM Agent for Session Manager
 
 Parameters:
 
