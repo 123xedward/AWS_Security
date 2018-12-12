@@ -1,0 +1,84 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "Cloudformation Stack which create four endpoints in order to enable 
+SSM Agent in Private subnets."
+
+Parameters:
+
+  VPCId:
+    Description: VPCId 
+    Type: AWS::EC2::VPC::Id
+
+  Subnets:
+    Description: Subnets
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+
+  SSMEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      VpcId: !Ref VPCId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssm
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Ref Subnets]
+        - !Select [1, !Ref Subnets]
+      SecurityGroupIds: 
+        - !Ref SGEndpoints
+
+  EC2MessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      VpcId: !Ref VPCId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ec2messages
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Ref Subnets]
+        - !Select [1, !Ref Subnets]
+      SecurityGroupIds: 
+        - !Ref SGEndpoints
+
+  EC2Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      VpcId: !Ref VPCId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ec2
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Ref Subnets]
+        - !Select [1, !Ref Subnets]
+      SecurityGroupIds: 
+        - !Ref SGEndpoints
+
+  SSMMessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      VpcId: !Ref VPCId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssmmessages
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Ref Subnets]
+        - !Select [1, !Ref Subnets]
+      SecurityGroupIds: 
+        - !Ref SGEndpoints
+
+  SGEndpoints:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: Endpoints SecurityGroup
+      GroupDescription: Endpoints SecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: SG_Endpoints 
+      VpcId: !Ref VPCId
