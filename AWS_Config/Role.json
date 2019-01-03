@@ -14,5 +14,5 @@
             "Resource": "*",
             "Effect": "Allow"
         }
-    ]
+    ] 
 }
