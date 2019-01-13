@@ -4,7 +4,7 @@ apply remediation by replacing the 0.0.0.0/0 22/tcp inbound rule with
 10.10.0.0/16 22/tcp. Notifications are sent to an SNS topic.
 """
 
-import boto3
+import boto3 
 
 # AWS Config settings
 ACCOUNT_ID = boto3.client('sts').get_caller_identity()['Account']
