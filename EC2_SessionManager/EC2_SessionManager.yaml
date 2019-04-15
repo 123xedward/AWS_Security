@@ -52,7 +52,9 @@ Resources:
                     - |
                       #!/bin/bash
                       sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-                      sudo yum install -y mariadb.x86_64
+                      sudo systemctl status amazon-ssm-agent
+                      sudo systemctl enable amazon-ssm-agent
+                      sudo systemctl start amazon-ssm-agent
                     - { valor: "x" }
       Tags:
         - Key: Name
