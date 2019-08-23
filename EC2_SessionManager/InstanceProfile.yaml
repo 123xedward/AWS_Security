@@ -1,0 +1,118 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Cloudformation Stack which create: 
+EC2 Role for SessionManager
+InstanceProfile for autoscaling:CreateLaunchConfiguration
+SecurityGroups for Endpoints
+"
+
+Parameters:
+
+  VPCId:
+    Description: VPCId 
+    Type: AWS::EC2::VPC::Id
+
+  Subnets:
+    Description: Subnets for EC2 Instances
+    Type: List<AWS::EC2::Subnet::Id>    
+
+Resources:
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Path: /
+      Roles:
+        - !Ref EC2Role 
+      InstanceProfileName: EC2InstanceProfile
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EC2RoleForSessionManager
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+
+  SGEndpoints:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: Endpoints SecurityGroup
+      GroupDescription: Endpoints SecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: 'tcp'
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: 'tcp'
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: SG_Endpoints 
+      VpcId: !Ref VPCId
+    
+  SSMEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      VpcId: !Ref VPCId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssm
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Ref Subnets]
+        - !Select [1, !Ref Subnets]
+      SecurityGroupIds: 
+        - !Ref SGEndpoints
+
+  EC2MessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      VpcId: !Ref VPCId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ec2messages
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Ref Subnets]
+        - !Select [1, !Ref Subnets]
+      SecurityGroupIds: 
+        - !Ref SGEndpoints
+
+  EC2Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      VpcId: !Ref VPCId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ec2
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Ref Subnets]
+        - !Select [1, !Ref Subnets]
+      SecurityGroupIds: 
+        - !Ref SGEndpoints
+
+  SSMMessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      VpcId: !Ref VPCId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssmmessages
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Ref Subnets]
+        - !Select [1, !Ref Subnets]
+      SecurityGroupIds: 
+        - !Ref SGEndpoints
+
+
